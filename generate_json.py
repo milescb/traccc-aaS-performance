@@ -54,9 +54,9 @@ if __name__ == "__main__":
                         default='/global/cfs/projectdirs/m3443/data/traccc-aaS/data/tml_pixels/event000000000-cells.csv',
                         type=str, help="Input CSV file path")
     parser.add_argument("-o", "--output", 
-                        default='/global/cfs/projectdirs/m3443/data/traccc-aaS/test_data/test_perf_data.json', 
+                        default='/global/cfs/projectdirs/m3443/data/traccc-aaS/test_data/perf_data_odd.json', 
                         type=str, help="Output JSON file path")
-    parser.add_argument("tml", "--tml-detector", action='store_true', help="Flag to indicate if the input data is for TML detector")
+    parser.add_argument("-tml", "--tml-detector", action='store_true', help="Flag to indicate if the input data is for TML detector")
     args = parser.parse_args()
 
     main()
