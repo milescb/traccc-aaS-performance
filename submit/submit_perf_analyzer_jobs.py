@@ -60,7 +60,7 @@ def main():
 
     # Start Docker container in the tmux session
     docker_command = "shifter --module=gpu --image=docexoty/tritonserver:latest"
-    source_command = "source ../setup.out"
+    source_command = "source ../setup.sh"
     subprocess.run(source_command, shell=True)
     run_command_in_tmux(session_name, f"client", f"{docker_command}")
     time.sleep(10)

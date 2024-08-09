@@ -14,7 +14,7 @@ def process_log_file(filepath, is_gpu):
             else:
                 time_match = cpu_time_pattern.search(content)
             if time_match:
-                time = int(time_match.group(1))
+                time = float(time_match.group(1))
                 key = 'gpu' if is_gpu else 'cpu'
                 data[key][mu] = time
             else:
@@ -24,23 +24,24 @@ def process_log_file(filepath, is_gpu):
 
 def plot_data(data):
 
-    plt.figure(figsize=(6, 6))
+    plt.figure(figsize=(5, 5))
 
     cpu_mu = sorted(data['cpu'].keys())
     cpu_time = [data['cpu'][mu] for mu in cpu_mu]
-    plt.plot(cpu_mu, cpu_time, label='CPU', marker='o')
+    plt.plot(cpu_mu, cpu_time, label='AMD EPYC 7763 (48 CPU cores)', marker='o')
 
     gpu_mu = sorted(data['gpu'].keys())
     gpu_time = [data['gpu'][mu] for mu in gpu_mu]
     
-    plt.plot(gpu_mu, gpu_time, label='GPU', marker='s')
+    plt.plot(gpu_mu, gpu_time, label='NVIDIA A100 SXM4 80GB (2 CPU cores)', marker='s')
     plt.xlabel('Average interactions per bunch crossing', loc='right')
-    plt.ylabel('Time to Complete Clusterization (ms)', loc='top')
+    plt.ylabel('Throughput for full-chain (events / sec)', loc='top')
     plt.legend()
+    plt.yscale('log')
     plt.grid(True)
 
     # Show the plot
-    plt.savefig('plots/mu_vs_time.pdf', bbox_inches='tight')
+    plt.savefig(f'{args.log_dir}/mu_vs_throughput.pdf', bbox_inches='tight')
 
 def main():
     
@@ -68,8 +69,10 @@ if __name__ == "__main__":
     
     # search for relevant lines in log files
     mu_pattern = re.compile(r'mu(\d+)')
-    cpu_time_pattern = re.compile(r'Clusterization\s+(\d+)\s*m')
-    gpu_time_pattern = re.compile(r'Clusterization \(cuda\)\s+(\d+)\s*ms')
+    # cpu_time_pattern = re.compile(r'Clusterization\s+(\d+)\s*m')
+    # gpu_time_pattern = re.compile(r'Clusterization \(cuda\)\s+(\d+)\s*ms')
+    cpu_time_pattern = re.compile(r'Event processing\s+\d+\.\d+\s+ms/event,\s+(\d+\.\d+)\s*events/s')
+    gpu_time_pattern = cpu_time_pattern
     
     # initialize data
     data = {'gpu': {}, 'cpu': {}}
