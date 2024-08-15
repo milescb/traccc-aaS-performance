@@ -18,10 +18,19 @@ def plot_instance_cpu_gpu(cpu_data, gpu_data, concurrency=1,
     vals_gpu = []
     for i in in_cpu:
         val = cpu_data[i][cpu_data[i]['Concurrency'] == concurrency][variable].values
-        vals_cpu.append(val[0])
+        if len(val) == 0:
+            print(f'No data for {i} instances and {concurrency} concurrent requests, setting to 0')
+            vals_cpu.append(0.0)
+        else:
+            vals_cpu.append(val[0])
+        
     for i in in_gpu:
         val = gpu_data[i][gpu_data[i]['Concurrency'] == concurrency][variable].values
-        vals_gpu.append(val[0])
+        if len(val) == 0:
+            print(f'No data for {i} instances and {concurrency} concurrent requests, setting to 0')
+            vals_gpu.append(0.0)
+        else:
+            vals_gpu.append(val[0])
         
     plt.plot(in_cpu, vals_cpu, label='CPU', marker='o')
     plt.plot(in_gpu, vals_gpu, label='GPU', marker='s')
@@ -47,7 +56,11 @@ def plot_var_vs_instance(data_dict,
         vals = []
         for i in instances:
             val = data_dict[i][data_dict[i]['Concurrency'] == con][variable].values
-            vals.append(val[0])
+            if len(val) == 0:
+                print(f'No data for {i} instances and {con} concurrent requests, setting to 0')
+                vals.append(0.0)
+            else:
+                vals.append(val[0])
         con_vals.append(vals)
     
     if ratio:
@@ -144,13 +157,13 @@ def main():
     cpu_data_instances, gpu_data_instances = process_csv_dir(args.input_directory)
     
     plot_var_vs_instance(gpu_data_instances)
-    plot_var_vs_concurrency(gpu_data_instances)
+    # plot_var_vs_concurrency(gpu_data_instances)
     plot_var_vs_instance(cpu_data_instances, 
                          ylabel='CPU Throughput (infer/sec)',
                          save_name='instances_vs_throughput_cpu.pdf')
-    plot_var_vs_concurrency(cpu_data_instances,
-                            ylabel='CPU Throughput (infer/sec)',
-                            save_name='concurrency_vs_throughput_cpu.pdf')
+    # plot_var_vs_concurrency(cpu_data_instances,
+    #                         ylabel='CPU Throughput (infer/sec)',
+    #                         save_name='concurrency_vs_throughput_cpu.pdf')
     plot_var_vs_instance(gpu_data_instances, 
                          variable='Avg latency', 
                          ylabel='GPU Latency (us)',
