@@ -19,7 +19,8 @@ def plot_instance_cpu_gpu(cpu_data, gpu_data, concurrency=1,
     for i in in_cpu:
         val = cpu_data[i][cpu_data[i]['Concurrency'] == concurrency][variable].values
         if len(val) == 0:
-            print(f'No data for {i} instances and {concurrency} concurrent requests, setting to 0')
+            print(f'No data for {i} instances and {concurrency} \
+                concurrent requests, setting to 0')
             vals_cpu.append(0.0)
         else:
             vals_cpu.append(val[0])
@@ -27,7 +28,8 @@ def plot_instance_cpu_gpu(cpu_data, gpu_data, concurrency=1,
     for i in in_gpu:
         val = gpu_data[i][gpu_data[i]['Concurrency'] == concurrency][variable].values
         if len(val) == 0:
-            print(f'No data for {i} instances and {concurrency} concurrent requests, setting to 0')
+            print(f'No data for {i} instances and {concurrency} \
+                concurrent requests, setting to 0')
             vals_gpu.append(0.0)
         else:
             vals_gpu.append(val[0])
@@ -39,7 +41,7 @@ def plot_instance_cpu_gpu(cpu_data, gpu_data, concurrency=1,
     plt.legend()
     plt.grid(True)
     
-    plt.savefig(f'{args.output_directory}/{save_name}', bbox_inches='tight')
+    plt.savefig(f'{OUTPUT_DIR}/{save_name}', bbox_inches='tight')
 
     
 def plot_var_vs_instance(data_dict, 
@@ -57,7 +59,8 @@ def plot_var_vs_instance(data_dict,
         for i in instances:
             val = data_dict[i][data_dict[i]['Concurrency'] == con][variable].values
             if len(val) == 0:
-                print(f'No data for {i} instances and {con} concurrent requests, setting to 0')
+                print(f'No data for {i} instances and {con} \
+                    concurrent requests, setting to 0')
                 vals.append(0.0)
             else:
                 vals.append(val[0])
@@ -71,13 +74,17 @@ def plot_var_vs_instance(data_dict,
             
         colors = plt.get_cmap('tab10')
             
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(5, 5.5), sharex=True, gridspec_kw={'height_ratios': [4, 1]})
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(5, 5.5), 
+                                       sharex=True, 
+                                       gridspec_kw={'height_ratios': [4, 1]})
         
         for i, con in enumerate(concurrencies):
-            ax1.plot(instances, con_vals[i], 'o-', color=colors(i), label=f'{con} concurrent requests')
+            ax1.plot(instances, con_vals[i], 'o-', 
+                     color=colors(i), label=f'{con} concurrent requests')
             
         for i, con in enumerate(concurrencies[1:]):
-            ax2.plot(instances, ratio_vals[i], 'o-', color=colors(i+1), label=f'{con} concurrent requests')
+            ax2.plot(instances, ratio_vals[i], 'o-', 
+                     color=colors(i+1), label=f'{con} concurrent requests')
             
         ax1.set_ylabel(ylabel, loc='top')
         ax1.legend()
@@ -88,18 +95,19 @@ def plot_var_vs_instance(data_dict,
         ax2.grid(True)
         
         plt.subplots_adjust(hspace=0) 
-        plt.savefig(f'{args.output_directory}/{save_name}', bbox_inches='tight')
+        plt.savefig(f'{OUTPUT_DIR}/{save_name}', bbox_inches='tight')
         
     else:
         plt.figure(figsize=(5, 5))
         for con in concurrencies:
-            plt.plot(instances, con_vals[con], 'o-', label=f'{con} concurrent requests')
+            plt.plot(instances, con_vals[con], 'o-', label=f'{con} \
+                concurrent requests')
         plt.xlabel('Number of Instances', loc='right')
         plt.ylabel(ylabel, loc='top')
         plt.legend()
         plt.grid(True)
         
-        plt.savefig(f'{args.output_directory}/{save_name}', bbox_inches='tight')
+        plt.savefig(f'{OUTPUT_DIR}/{save_name}', bbox_inches='tight')
         
 def plot_var_vs_concurrency(data_dict, 
                             variable='Inferences/Second', 
@@ -115,19 +123,24 @@ def plot_var_vs_concurrency(data_dict,
         
         ratio_vals = []
         for i in range(1, len(instances)):
-            ratio_vals.append([x/y for x, y in zip(data_dict[i][variable].values, data_dict[1][variable].values)])
+            ratio_vals.append([x/y for x, y in zip(data_dict[i][variable].values, 
+                                                   data_dict[1][variable].values)])
             
         colors = plt.get_cmap('tab10')
             
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(5, 5.5), sharex=True, gridspec_kw={'height_ratios': [4, 1]})
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(5, 5.5), 
+                                       sharex=True, 
+                                       gridspec_kw={'height_ratios': [4, 1]})
         
         for i, instance in enumerate(instances):
             if i < max_concurrency:
-                ax1.plot(concurrencies, data_dict[instance][variable].values, 'o-', color=colors(i), label=f'{instance} instances')
+                ax1.plot(concurrencies, data_dict[instance][variable].values, 'o-', 
+                         color=colors(i), label=f'{instance} instances')
             
         for i, instance in enumerate(instances[1:]):
             if i < max_concurrency:
-                ax2.plot(concurrencies, ratio_vals[i], 'o-', color=colors(i+1), label=f'{instance} instances')
+                ax2.plot(concurrencies, ratio_vals[i], 'o-', 
+                         color=colors(i+1), label=f'{instance} instances')
             
         ax1.set_ylabel(ylabel, loc='top')
         ax1.legend()
@@ -138,19 +151,20 @@ def plot_var_vs_concurrency(data_dict,
         ax2.grid(True)
         
         plt.subplots_adjust(hspace=0) 
-        plt.savefig(f'{args.output_directory}/{save_name}', bbox_inches='tight')
+        plt.savefig(f'{OUTPUT_DIR}/{save_name}', bbox_inches='tight')
     
     else:  
         plt.figure(figsize=(5, 5))
         for i, instance in enumerate(instances):
             if i < max_concurrency:
-                plt.plot(concurrencies, data_dict[instance][variable].values, 'o-', label=f'{instance} instances')
+                plt.plot(concurrencies, data_dict[instance][variable].values, 
+                         'o-', label=f'{instance} instances')
         plt.xlabel('Number of Concurrent Requests', loc='right')
         plt.ylabel(ylabel, loc='top')
         plt.legend()
         plt.grid(True)
         
-        plt.savefig(f'{args.output_directory}/{save_name}', bbox_inches='tight')
+        plt.savefig(f'{OUTPUT_DIR}/{save_name}', bbox_inches='tight')
 
 def main():
     
@@ -189,7 +203,7 @@ def main():
         plot_instance_cpu_gpu(cpu_data_instances, gpu_data_instances, concurrency=i,
                             save_name=f'instances_vs_throughput_compare_con{i}.pdf')
         plot_instance_cpu_gpu(cpu_data_instances, gpu_data_instances, 
-                            concurrency=4,
+                            concurrency=i,
                             variable='Avg latency',
                             ylabel='Average Latency (us)',
                             save_name=f'instances_vs_latency_compare_con{i}.pdf')
@@ -201,8 +215,11 @@ if __name__ == '__main__':
                         default='data/instances',
                         type=str, help="Input directory path")
     parser.add_argument("-o", "--output-directory", 
-                        default='plots',
+                        default='same',
                         type=str, help="Output directory path")
     args = parser.parse_args()
+    
+    if args.output_directory == 'same':
+        OUTPUT_DIR = args.input_directory
     
     main()
