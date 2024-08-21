@@ -102,7 +102,8 @@ find "$output_dir" -type f -name "*.csv" -exec rm -f {} \;
 # Function to run perf_analyzer
 run_perf_analyzer() {
     local mode=$1  # sync or async
-    local output_csv="$output_dir/${output_csv_name}_${n_instance_per_gpu}insts_${n_gpus}gpus_${mode}.csv"
+    local processor=$2 # cpu or gpu
+    local output_csv="${output_dir}/${processor}_${n_instance_per_gpu}instance.csv"
     local attempt=0
     local measurement_interval=${_measurement_interval}
     local mode_flag=""
@@ -122,7 +123,7 @@ run_perf_analyzer() {
 
     while [[ ! -f ${output_csv} && $attempt -lt $max_attempts ]]; do
         echo "Running perf_analyzer (${mode}) with measurement_interval: $measurement_interval..."
-        perf_analyzer -m traccc-$2 --percentile=95 -i grpc --input-data performance/data/odd_traccc_old/dummy_data.json \
+        perf_analyzer -m traccc-$processor --percentile=95 -i grpc --input-data performance/data/odd_traccc_old/dummy_data.json \
         --measurement-interval ${measurement_interval} $mode_flag \
         --concurrency-range 1:$concurrency_range:$concurrency_step -v \
         -f ${output_csv} -b 1 --collect-metrics --verbose-csv --metrics-interval 10000
@@ -157,10 +158,10 @@ echo "Running perf_analyzer for the sync mode with GPU"
 run_perf_analyzer "sync" "gpu"
 echo "Sync mode GPU done"
 
-echo ""
-echo "Running perf_analyzer for the sync mode with CPU"
-run_perf_analyzer "sync" "cpu"
-echo "Sync mode CPU done"
+# echo ""
+# echo "Running perf_analyzer for the sync mode with CPU"
+# run_perf_analyzer "sync" "cpu"
+# echo "Sync mode CPU done"
 
 # echo ""
 # echo "Running perf_analyzer for the async mode"

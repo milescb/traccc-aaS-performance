@@ -2,7 +2,7 @@
 
 DIR="$(dirname "${BASH_SOURCE[0]}")"
 
-for i in {1..5}
+for i in {6..8}
 do
-  "$DIR/evaluate_triton.sh" $i
+  "$DIR/run_analyzer.sh" $i
 done

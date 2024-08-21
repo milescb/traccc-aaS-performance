@@ -81,14 +81,17 @@ def instance_number(filename):
 def process_csv_dir(directory):
     gpu_data_instances = {}
     cpu_data_instances = {}
-    for filename in os.listdir(directory):
-        if filename.endswith('.csv'):
-            if 'gpu' in filename:
-                gpu_data = pd.read_csv(os.path.join(directory, filename))
-                gpu_data = clean_pandas_df(gpu_data)
-                gpu_data_instances[instance_number(filename)] = gpu_data
-            elif 'cpu' in filename:
-                cpu_data = pd.read_csv(os.path.join(directory, filename))
-                cpu_data = clean_pandas_df(cpu_data)
-                cpu_data_instances[instance_number(filename)] = cpu_data
+    for root, _, files in os.walk(directory):
+        for filename in files:
+            if filename.endswith('.csv'):
+                file_path = os.path.join(root, filename)
+                if 'gpu' in filename:
+                    gpu_data = pd.read_csv(file_path)
+                    gpu_data = clean_pandas_df(gpu_data)
+                    gpu_data_instances[instance_number(filename)] = gpu_data
+                elif 'cpu' in filename:
+                    cpu_data = pd.read_csv(file_path)
+                    cpu_data = clean_pandas_df(cpu_data)
+                    cpu_data_instances[instance_number(filename)] = cpu_data
     return cpu_data_instances, gpu_data_instances
+    

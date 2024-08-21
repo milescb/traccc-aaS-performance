@@ -1,8 +1,12 @@
 
 import matplotlib.pyplot as plt
 import argparse
+import mplhep as hep
 
 from performance.utils import process_csv_dir
+
+plt.style.use(hep.style.ATLAS)
+figsize = (7, 7.5)
 
 def plot_instance_cpu_gpu(cpu_data, gpu_data, concurrency=1, 
                           variable='Inferences/Second',
@@ -74,7 +78,7 @@ def plot_var_vs_instance(data_dict,
             
         colors = plt.get_cmap('tab10')
             
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(5, 5.5), 
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=figsize, 
                                        sharex=True, 
                                        gridspec_kw={'height_ratios': [4, 1]})
         
@@ -128,7 +132,7 @@ def plot_var_vs_concurrency(data_dict,
             
         colors = plt.get_cmap('tab10')
             
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(5, 5.5), 
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=figsize, 
                                        sharex=True, 
                                        gridspec_kw={'height_ratios': [4, 1]})
         
@@ -171,42 +175,42 @@ def main():
     cpu_data_instances, gpu_data_instances = process_csv_dir(args.input_directory)
     
     plot_var_vs_instance(gpu_data_instances)
-    # plot_var_vs_concurrency(gpu_data_instances)
-    plot_var_vs_instance(cpu_data_instances, 
-                         ylabel='CPU Throughput (infer/sec)',
-                         save_name='instances_vs_throughput_cpu.pdf')
+    plot_var_vs_concurrency(gpu_data_instances)
+    # plot_var_vs_instance(cpu_data_instances, 
+    #                      ylabel='CPU Throughput (infer/sec)',
+    #                      save_name='instances_vs_throughput_cpu.pdf')
     # plot_var_vs_concurrency(cpu_data_instances,
     #                         ylabel='CPU Throughput (infer/sec)',
     #                         save_name='concurrency_vs_throughput_cpu.pdf')
     plot_var_vs_instance(gpu_data_instances, 
-                         variable='Avg latency', 
+                         variable='p95 latency', 
                          ylabel='GPU Latency (us)',
                          save_name='instances_vs_latency_gpu.pdf')
-    plot_var_vs_instance(cpu_data_instances,
-                         variable='Avg latency',
-                         ylabel='CPU Latency (us)',
-                         save_name='instances_vs_latency_cpu.pdf')
+    # plot_var_vs_instance(cpu_data_instances,
+    #                      variable='Avg latency',
+    #                      ylabel='CPU Latency (us)',
+    #                      save_name='instances_vs_latency_cpu.pdf')
     plot_var_vs_instance(gpu_data_instances,
                          variable='total_gpu_usage',
                          ylabel='GPU Utilization (%)',
                          save_name='instances_vs_gpu_utilization.pdf')
-    plot_var_vs_instance(gpu_data_instances,
-                         variable='max_gpu_memory',
-                         ylabel='GPU Memory Usage (GB)',
-                         save_name='instances_vs_gpu_memory.pdf')
+    # plot_var_vs_instance(gpu_data_instances,
+    #                      variable='max_gpu_memory',
+    #                      ylabel='GPU Memory Usage (GB)',
+    #                      save_name='instances_vs_gpu_memory.pdf')
     plot_var_vs_instance(gpu_data_instances,
                          variable='percent_gpu_memory',
                          ylabel='GPU Memory Usage (%)',
                          save_name='instances_vs_gpu_memory_percent.pdf')
     
-    for i in range(1, 6):
-        plot_instance_cpu_gpu(cpu_data_instances, gpu_data_instances, concurrency=i,
-                            save_name=f'instances_vs_throughput_compare_con{i}.pdf')
-        plot_instance_cpu_gpu(cpu_data_instances, gpu_data_instances, 
-                            concurrency=i,
-                            variable='Avg latency',
-                            ylabel='Average Latency (us)',
-                            save_name=f'instances_vs_latency_compare_con{i}.pdf')
+    # for i in range(1, 6):
+    #     plot_instance_cpu_gpu(cpu_data_instances, gpu_data_instances, concurrency=i,
+    #                         save_name=f'instances_vs_throughput_compare_con{i}.pdf')
+    #     plot_instance_cpu_gpu(cpu_data_instances, gpu_data_instances, 
+    #                         concurrency=i,
+    #                         variable='Avg latency',
+    #                         ylabel='Average Latency (us)',
+    #                         save_name=f'instances_vs_latency_compare_con{i}.pdf')
 
 if __name__ == '__main__':
     
