@@ -1,12 +1,16 @@
 
 import matplotlib.pyplot as plt
 import argparse
-import mplhep as hep
 
 from performance.utils import process_csv_dir
 
-plt.style.use(hep.style.ATLAS)
-figsize = (7, 7.5)
+# Global plotting settings
+plt.rcParams['legend.frameon'] = False
+plt.rcParams['axes.labelsize'] = 14 
+
+# import mplhep as hep
+# plt.style.use(hep.style.ATLAS)
+figsize = (5, 5.5)
 
 def plot_instance_cpu_gpu(cpu_data, gpu_data, concurrency=1, 
                           variable='Inferences/Second',
@@ -84,11 +88,11 @@ def plot_var_vs_instance(data_dict,
         
         for i, con in enumerate(concurrencies):
             ax1.plot(instances, con_vals[i], 'o-', 
-                     color=colors(i), label=f'{con} concurrent requests')
+                     color=colors(i), label=f'{con} requests')
             
         for i, con in enumerate(concurrencies[1:]):
             ax2.plot(instances, ratio_vals[i], 'o-', 
-                     color=colors(i+1), label=f'{con} concurrent requests')
+                     color=colors(i+1), label=f'{con} requests')
             
         ax1.set_ylabel(ylabel, loc='top')
         ax1.legend()
@@ -118,7 +122,7 @@ def plot_var_vs_concurrency(data_dict,
                             ylabel='GPU Throughput (infer/sec)',
                             save_name='concurrency_vs_throughput_gpu.pdf',
                             ratio=True,
-                            max_concurrency=5):
+                            max_concurrency=6):
     
     instances = sorted(data_dict.keys())
     concurrencies = data_dict[1]['Concurrency'].values
@@ -142,7 +146,7 @@ def plot_var_vs_concurrency(data_dict,
                          color=colors(i), label=f'{instance} instances')
             
         for i, instance in enumerate(instances[1:]):
-            if i < max_concurrency:
+            if i < (max_concurrency - 1):
                 ax2.plot(concurrencies, ratio_vals[i], 'o-', 
                          color=colors(i+1), label=f'{instance} instances')
             

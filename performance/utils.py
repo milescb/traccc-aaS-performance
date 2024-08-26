@@ -72,7 +72,7 @@ def clean_pandas_df(df):
     return df
 
 def instance_number(filename):
-    match = re.search(r'(cpu|gpu)_(\d+)instance\.csv', filename)
+    match = re.search(r'(cpu|gpu)_(\d+)instance_sync\.csv', filename)
     if match:
         return int(match.group(2))
     else:
