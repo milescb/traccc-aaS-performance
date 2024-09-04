@@ -16,6 +16,8 @@ import os
 import pandas as pd
 
 def clean_pandas_df(df):
+    """
+    """
     df = df.sort_values(by='Concurrency', ascending=True)
     
     new_columns = {}
@@ -78,12 +80,14 @@ def instance_number(filename):
     else:
         return None
 
-def process_csv_dir(directory):
+def process_csv_dir(directory, one_gpu=True):
     gpu_data_instances = {}
     cpu_data_instances = {}
     for root, _, files in os.walk(directory):
         for filename in files:
             if filename.endswith('.csv'):
+                if one_gpu and '_1gpus' not in root:
+                    continue
                 file_path = os.path.join(root, filename)
                 if 'gpu' in filename:
                     gpu_data = pd.read_csv(file_path)
@@ -94,4 +98,46 @@ def process_csv_dir(directory):
                     cpu_data = clean_pandas_df(cpu_data)
                     cpu_data_instances[instance_number(filename)] = cpu_data
     return cpu_data_instances, gpu_data_instances
+
+def process_log_file(data, filepath, is_gpu):
+    
+    # search for relevant lines in log files
+    mu_pattern = re.compile(r'mu(\d+)')
+    # cpu_time_pattern = re.compile(r'Clusterization\s+(\d+)\s*m')
+    # gpu_time_pattern = re.compile(r'Clusterization \(cuda\)\s+(\d+)\s*ms')
+    cpu_time_pattern = re.compile(r'Event processing\s+\d+\.\d+\s+ms/event,\s+(\d+\.\d+)\s*events/s')
+    gpu_time_pattern = cpu_time_pattern
+    
+    with open(filepath, 'r') as file:
+        content = file.read()
+        mu_match = mu_pattern.search(filepath)
+        if mu_match:
+            mu = int(mu_match.group(1))
+            if is_gpu:
+                time_match = gpu_time_pattern.search(content)
+            else:
+                time_match = cpu_time_pattern.search(content)
+            if time_match:
+                time = float(time_match.group(1))
+                key = 'gpu' if is_gpu else 'cpu'
+                data[key][mu] = time
+            else:
+                print(f"Could not find time in {filepath}")
+        else:
+            print(f"Could not find mu in {filepath}")
+            
+def process_log_dir(log_dir):
+    
+    data = {'gpu': {}, 'cpu': {}}
+    # loop over all files in the directory
+    for filename in os.listdir(log_dir):
+        if filename.endswith('.log'):
+            if 'gpu' in filename:
+                process_log_file(data, os.path.join(log_dir, filename), is_gpu=True)
+            elif 'cpu' in filename:
+                process_log_file(data, os.path.join(log_dir, filename), is_gpu=False)
+        else:
+            print(f"Skipping {filename}. Not a log file.")
+            
+    return data
     
