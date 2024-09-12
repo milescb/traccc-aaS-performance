@@ -12,7 +12,7 @@ n_instance_per_gpu=${1:-1}
 n_gpus=${2:-1}
 output_csv_name=${3:-"perf_analyzer"}
 _measurement_interval=${4:-100000}
-output_dir=${5:-"performance/data/odd_traccc_old"}  # Default to the specified directory
+output_dir=${5:-"performance/data/"}  # Default to the specified directory
 concurrency_end=${6:-5}
 concurrency_step=${7:-1}
 max_attempts=5  # Maximum attempts to generate the file
@@ -36,7 +36,7 @@ if [[ "$1" == "-h" || "$1" == "--help" ]]; then
     exit 0
 fi
 
-export INSTALLDIR=/global/cfs/projectdirs/m3443/data/traccc-aaS/software/prod/ver_08282024_traccc_v0.10.0/install
+export INSTALLDIR=/global/cfs/projectdirs/m3443/data/traccc-aaS/software/prod/ver_09042024_traccc_v0.15.0/install
 export PATH=$INSTALLDIR/bin:$PATH
 export LD_LIBRARY_PATH=$INSTALLDIR/lib:$LD_LIBRARY_PATH
 
@@ -44,7 +44,7 @@ export LD_LIBRARY_PATH=$INSTALLDIR/lib:$LD_LIBRARY_PATH
 output_dir=$output_dir/${n_instance_per_gpu}insts_${n_gpus}gpus/ # avoid conflict of difference instance config
 
 mkdir -p $output_dir
-cp -r backend/models $output_dir/
+cp -r $INSTALLDIR/models $output_dir/
 sed -i "s/count: 1/count: ${n_instance_per_gpu}/" $output_dir/models/traccc-cpu/config.pbtxt
 sed -i "s/count: 1/count: ${n_instance_per_gpu}/" $output_dir/models/traccc-gpu/config.pbtxt
 
