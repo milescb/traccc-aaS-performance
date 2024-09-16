@@ -7,11 +7,11 @@ DIR="$(dirname "${BASH_SOURCE[0]}")"
 
 # "$DIR/run_analyzer.sh" 1 4 "" 100000 "performance/data/init_everything_take2" 8
 
-for i in {1..10}
+for i in {1..8}
 do
     echo ""
     echo "Running with $i model instances"
     echo "-------------------------------"
     echo ""
-    "$DIR/run_analyzer.sh" $i 1 "" 50000 "performance/data/main_traccc" $i 1 $i "models"
+    "$DIR/run_analyzer.sh" $i 1 "" 50000 "performance/data/main_traccc_nom" $i 1 $i "models"
 done

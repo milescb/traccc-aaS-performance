@@ -11,10 +11,10 @@ uname -a
 n_instance_per_gpu=${1:-1}
 n_gpus=${2:-1}
 output_csv_name=${3:-"perf_analyzer"}
-_measurement_interval=${4:-100000}
-output_dir=${5:-"performance/data/"}  # Default to the specified directory
-concurrency_end=${6:-5}
-concurrency_step=${7:-1}
+_measurement_interval=${4:-50000}
+output_dir=${5:-"performance/data/main_traccc_nom"}  # Default to the specified directory
+concurrency_end=${6:-8}
+concurrency_step=${7:-3}
 concurrency_start=${8:-1}
 model_repo_name=${9:-"models"}
 max_attempts=5  # Maximum attempts to generate the file
@@ -114,7 +114,7 @@ run_perf_analyzer() {
     local concurrency_range=${concurrency_end}
     local concurrency_step=${concurrency_step}
     local concurrency_start=${concurrency_start}
-    echo "Concurrency Range: 1:$concurrency_range:$concurrency_step"
+    echo "Concurrency Range: $concurrency_start:$concurrency_range:$concurrency_step"
 
 
     # Set the mode flag based on sync or async
