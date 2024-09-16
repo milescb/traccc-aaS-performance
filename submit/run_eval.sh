@@ -13,5 +13,5 @@ do
     echo "Running with $i model instances"
     echo "-------------------------------"
     echo ""
-    "$DIR/run_analyzer.sh" $i 1 "" 10000 "performance/data/odd_tracccv0.15" 8
+    "$DIR/run_analyzer.sh" $i 1 "" 30000 "performance/data/main_traccc" 8 1 "models"
 done

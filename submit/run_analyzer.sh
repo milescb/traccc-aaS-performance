@@ -15,6 +15,7 @@ _measurement_interval=${4:-100000}
 output_dir=${5:-"performance/data/"}  # Default to the specified directory
 concurrency_end=${6:-5}
 concurrency_step=${7:-1}
+model_repo_name=${8:-"models"}
 max_attempts=5  # Maximum attempts to generate the file
 
 # Display help information
@@ -36,7 +37,7 @@ if [[ "$1" == "-h" || "$1" == "--help" ]]; then
     exit 0
 fi
 
-export INSTALLDIR=/global/cfs/projectdirs/m3443/data/traccc-aaS/software/prod/ver_09042024_traccc_v0.15.0/install
+export INSTALLDIR=/global/cfs/projectdirs/m3443/data/traccc-aaS/software/prod/ver_09152024/install
 export PATH=$INSTALLDIR/bin:$PATH
 export LD_LIBRARY_PATH=$INSTALLDIR/lib:$LD_LIBRARY_PATH
 
@@ -44,12 +45,12 @@ export LD_LIBRARY_PATH=$INSTALLDIR/lib:$LD_LIBRARY_PATH
 output_dir=$output_dir/${n_instance_per_gpu}insts_${n_gpus}gpus/ # avoid conflict of difference instance config
 
 mkdir -p $output_dir
-cp -r $INSTALLDIR/models $output_dir/
-sed -i "s/count: 1/count: ${n_instance_per_gpu}/" $output_dir/models/traccc-cpu/config.pbtxt
-sed -i "s/count: 1/count: ${n_instance_per_gpu}/" $output_dir/models/traccc-gpu/config.pbtxt
+cp -r $INSTALLDIR/$model_repo_name $output_dir/
+# sed -i "s/count: 1/count: ${n_instance_per_gpu}/" $output_dir/${model_repo_name}/traccc-cpu/config.pbtxt
+sed -i "s/count: 1/count: ${n_instance_per_gpu}/" $output_dir/${model_repo_name}/traccc-gpu/config.pbtxt
 
 gpus_array=$(seq 0 $((n_gpus - 1)) | tr '\n' ',' | sed 's/,$//')
-sed -i "/gpus:/c\    gpus: [ $gpus_array ]" $output_dir/models/traccc-gpu/config.pbtxt
+sed -i "/gpus:/c\    gpus: [ $gpus_array ]" $output_dir/${model_repo_name}/traccc-gpu/config.pbtxt
 
 check_server_ready() {
     local max_retries=100
@@ -85,7 +86,7 @@ check_server_ready() {
 # Start triton server in the background
 echo "Launching triton server..."
 log_filename="${output_dir}/${n_instance_per_gpu}insts_${n_gpus}gpus.log"
-nohup tritonserver --model-repository=$output_dir/models/ > ${log_filename} 2>&1 &
+nohup tritonserver --model-repository=$output_dir/${model_repo_name}/ > ${log_filename} 2>&1 &
 server_pid=$!
 sleep 20
 
