@@ -15,7 +15,8 @@ _measurement_interval=${4:-100000}
 output_dir=${5:-"performance/data/"}  # Default to the specified directory
 concurrency_end=${6:-5}
 concurrency_step=${7:-1}
-model_repo_name=${8:-"models"}
+concurrency_start=${8:-1}
+model_repo_name=${9:-"models"}
 max_attempts=5  # Maximum attempts to generate the file
 
 # Display help information
@@ -112,6 +113,7 @@ run_perf_analyzer() {
     # local concurrency_range=16
     local concurrency_range=${concurrency_end}
     local concurrency_step=${concurrency_step}
+    local concurrency_start=${concurrency_start}
     echo "Concurrency Range: 1:$concurrency_range:$concurrency_step"
 
 
@@ -126,7 +128,7 @@ run_perf_analyzer() {
         echo "Running perf_analyzer (${mode}) with measurement_interval: $measurement_interval..."
         perf_analyzer -m traccc-$processor --percentile=95 -i grpc --input-data performance/data/dummy_data.json \
         --measurement-interval ${measurement_interval} $mode_flag \
-        --concurrency-range 1:$concurrency_range:$concurrency_step -v \
+        --concurrency-range $concurrency_start:$concurrency_range:$concurrency_step -v \
         -f ${output_csv} -b 1 --collect-metrics --verbose-csv --metrics-interval 10000
 
         # If the file isn't generated, double the measurement_interval and retry
