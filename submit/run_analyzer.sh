@@ -13,9 +13,9 @@ n_gpus=${2:-1}
 output_csv_name=${3:-"perf_analyzer"}
 _measurement_interval=${4:-50000}
 output_dir=${5:-"performance/data/main_traccc_nom"}  # Default to the specified directory
-concurrency_end=${6:-8}
-concurrency_step=${7:-3}
-concurrency_start=${8:-1}
+concurrency_start=${6:-1}
+concurrency_end=${7:-8}
+concurrency_step=${8:-1}
 model_repo_name=${9:-"models"}
 max_attempts=5  # Maximum attempts to generate the file
 
@@ -151,7 +151,7 @@ run_perf_analyzer() {
 echo "Warm up"
 perf_analyzer -m traccc-gpu --percentile=95 -i grpc \
     --input-data performance/data/dummy_data.json \
-    --concurrency 2:4:1 --measurement-interval 30000
+    --concurrency 2:4:1 --measurement-interval 10000
 
 echo "Warm up done"
 

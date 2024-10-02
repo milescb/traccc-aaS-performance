@@ -2,6 +2,14 @@
 
 Set of scripts to analyze performance from the output of the `perf_analyzer` tool used to analyze performance of models using the NVIDIA triton server. These scripts are designed to analyze the performance of `traccc` as-a-service in particular. The backend for this and instructions about getting the model can be found [in this git repo](https://github.com/milescb/traccc-aaS). 
 
+## Do everything in one go
+
+The file `submit/run_eval.sh` runs performance studies and makes plots. A full command looks like
+
+```
+./submit/run_eval.sh <output_data_dir> <model_name> <bool_multi_gpu>
+```
+
 ## Create input for `perf_analyzer`
 
 Create input json file with 
@@ -32,13 +40,7 @@ perf_analyzer -m traccc-gpu --input-data $DATADIR/../test_data/test_perf_data.js
     -f gpu_1instances.csv 
 ```
 
-Immediately, one can make plots vs. concurrency with `python plot_concurrency_studies.py`. More interesting are plots as a function of model instances. In order to change the number of instances, edit the config files in the model repository to increase the number of model instances. Then, re-run the above `perf_analyzer` command, changing the name of the output file as `gpu_Xinstances.csv` where `X` is the number of model instances. Perform the same for CPU as well, then make plots via:
-
-```
-python plot_model_instance_studies.py -i <input_dir> -o <output_dir>
-```
-
-The script `submit/submit_perf_analyzer_jobs.py` performs all the above in one go. To make accurate measurements, spin up a dedicated node with GPUs and run the `submit_perf_analyzer_jobs.py` script. 
+Then, we can make plots with the provide python notebooks. 
 
 ### Compare CPU / GPU performance on `traccc` examples
 

@@ -140,4 +140,19 @@ def process_log_dir(log_dir):
             print(f"Skipping {filename}. Not a log file.")
             
     return data
+
+def int_to_string(n):
+    num_to_word = {
+        0: "Zero",
+        1: "One",
+        2: "Two",
+        3: "Three",
+        4: "Four",
+        5: "Five",
+        6: "Six",
+        7: "Seven",
+        8: "Eight",
+        9: "Nine"
+    }
     
+    return num_to_word.get(n, "Number out of range")  
