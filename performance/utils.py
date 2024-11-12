@@ -97,6 +97,10 @@ def process_csv_dir(directory, one_gpu=True):
                     cpu_data = pd.read_csv(file_path)
                     cpu_data = clean_pandas_df(cpu_data)
                     cpu_data_instances[instance_number(filename)] = cpu_data
+    
+    if not gpu_data_instances and not cpu_data_instances:
+        raise ValueError(f"No csv files found in {directory}")
+    
     return cpu_data_instances, gpu_data_instances
 
 def process_log_file(data, filepath, is_gpu):

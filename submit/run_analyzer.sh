@@ -17,6 +17,7 @@ concurrency_start=${6:-1}
 concurrency_end=${7:-8}
 concurrency_step=${8:-1}
 model_repo_name=${9:-"models"}
+input_data=${10:-"performance/data/dummy_data.json"}
 max_attempts=5  # Maximum attempts to generate the file
 
 # Display help information
@@ -126,10 +127,10 @@ run_perf_analyzer() {
 
     while [[ ! -f ${output_csv} && $attempt -lt $max_attempts ]]; do
         echo "Running perf_analyzer (${mode}) with measurement_interval: $measurement_interval..."
-        perf_analyzer -m traccc-$processor --percentile=95 -i grpc --input-data performance/data/dummy_data.json \
+        perf_analyzer -m traccc-$processor --percentile=95 -i grpc --input-data $input_data \
         --measurement-interval ${measurement_interval} $mode_flag \
         --concurrency-range $concurrency_start:$concurrency_range:$concurrency_step -v \
-        -f ${output_csv} -b 1 --collect-metrics --verbose-csv --metrics-interval 10000
+        -f ${output_csv} -b 1 --collect-metrics --verbose-csv # --metrics-interval 10000
 
         # If the file isn't generated, double the measurement_interval and retry
         if [[ ! -f ${output_csv} ]]; then
@@ -150,7 +151,7 @@ run_perf_analyzer() {
 
 echo "Warm up"
 perf_analyzer -m traccc-gpu --percentile=95 -i grpc \
-    --input-data performance/data/dummy_data.json \
+    --input-data $input_data \
     --concurrency 2:4:1 --measurement-interval 10000
 
 echo "Warm up done"
