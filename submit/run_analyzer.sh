@@ -18,6 +18,7 @@ concurrency_end=${7:-8}
 concurrency_step=${8:-1}
 model_repo_name=${9:-"models"}
 input_data=${10:-"performance/data/dummy_data.json"}
+remote_server=${11:-"false"}  # Default to false
 max_attempts=5  # Maximum attempts to generate the file
 
 # Display help information
@@ -85,12 +86,22 @@ check_server_ready() {
 }
 
 
-# Start triton server in the background
-echo "Launching triton server..."
-log_filename="${output_dir}/${n_instance_per_gpu}insts_${n_gpus}gpus.log"
-nohup tritonserver --model-repository=$output_dir/${model_repo_name}/ > ${log_filename} 2>&1 &
-server_pid=$!
-sleep 20
+if [[ "$remote_server" == "true" ]]; then
+    echo "Remote server is set to true. Skipping server launch..."
+    echo "Please ensure that the server is already running on the remote machine."
+elif [[ "$remote_server" == "false" ]]; then
+    echo "Remote server is set to false. Launching server..."
+    log_filename="${output_dir}/${n_instance_per_gpu}insts_${n_gpus}gpus.log"
+    nohup tritonserver --model-repository=$output_dir/models/ > ${log_filename} 2>&1 &
+    server_pid=$!
+    sleep 20
+
+    # Set a trap to ensure tritonserver is always killed on exit
+    trap 'echo "Killing triton server..."; kill "$server_pid"' EXIT
+else
+    echo "Invalid value for remote_server. Please set it to either 'true' or 'false'."
+    exit 1s
+fi
 
 
 # Set a trap to ensure tritonserver is always killed on exit
