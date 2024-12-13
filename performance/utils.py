@@ -28,6 +28,9 @@ def clean_pandas_df(df):
         gpu_memory = row['Max GPU Memory Usage'].rstrip(';').split(';')
         gpu_total_memory = row['Total GPU Memory'].rstrip(';').split(';')
         
+        gpu_power_utilization = row['Avg GPU Power Usage'].rstrip(';').split(';')
+        total_gpu_power = 250 # Watts
+        
         for i, gpu in enumerate(gpus):
             _, utilization = gpu.split(':')
             new_col_name = f'gpu_util_{i}'
@@ -54,6 +57,15 @@ def clean_pandas_df(df):
             if new_col_name not in new_columns:
                 new_columns[new_col_name] = [None] * len(df) 
             new_columns[new_col_name][index] = pd.to_numeric(memory, errors='coerce') * 1e-9
+            
+        for i, power in enumerate(gpu_power_utilization):
+            _, power = power.split(':')
+            new_col_name = f'gpu_power_{i}_W'
+            
+            # Add the power value to the new_columns dictionary
+            if new_col_name not in new_columns:
+                new_columns[new_col_name] = [None] * len(df) 
+            new_columns[new_col_name][index] = pd.to_numeric(power, errors='coerce')
     
     # Add the new columns to the DataFrame
     for new_col_name, values in new_columns.items():
@@ -66,10 +78,17 @@ def clean_pandas_df(df):
     df['max_gpu_memory'] = df[gpu_highest_memory_columns].max(axis=1)
     
     df['percent_gpu_memory'] = (df['max_gpu_memory'] / df['gpu_total_memory_0_GB']) * 100
+    
+    gpu_percent_power_columns = [col for col in df.columns if 'gpu_power_' in col]
+    for col in gpu_percent_power_columns:
+        df[col] = (df[col] / total_gpu_power) * 100
+        
+    df['largest_gpu_power_percent'] = (df[gpu_percent_power_columns].max(axis=1))
         
     df.drop('Avg GPU Utilization', axis=1, inplace=True)
     df.drop('Max GPU Memory Usage', axis=1, inplace=True)
     df.drop('Total GPU Memory', axis=1, inplace=True)
+    df.drop('Avg GPU Power Usage', axis=1, inplace=True)
     
     return df
 
