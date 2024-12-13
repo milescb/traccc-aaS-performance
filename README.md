@@ -59,3 +59,33 @@ then run the following to create the plot:
 ```
 python compare_gpu_cpu_traccc.py
 ```
+
+## Test k8 server performance
+
+To run `perf_analyzer` on a k8 cluster such as nautilus, follow the instructions on setting up the server in [traccc-aas](https://github.com/milescb/traccc-aaS). Then, forward the following ports:
+
+```
+kubectl port-forward service/triton-atlas 8001:8001 -n atlas-sonic
+```
+
+and 
+
+```
+kubectl port-forward service/triton-atlas 8002:8002 -n atlas-sonic
+```
+
+Then, run the performance script:
+
+```
+./submit/run_analyzer.sh <outdir> "" "" "" true
+```
+
+Finally, make plots with the produced data as before. 
+
+### !! Important !!
+
+Do not forget to uninstall the remote server when done testing:
+
+```
+helm uninstall super-sonic -n atlas-sonic
+```

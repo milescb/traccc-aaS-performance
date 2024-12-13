@@ -12,14 +12,14 @@ n_instance_per_gpu=${1:-1}
 n_gpus=${2:-1}
 output_csv_name=${3:-"perf_analyzer"}
 _measurement_interval=${4:-50000}
-output_dir=${5:-"performance/data/main_traccc_nom"}  # Default to the specified directory
+output_dir=${5:-"performance/data/main_traccc_nom"} 
 concurrency_start=${6:-1}
 concurrency_end=${7:-8}
 concurrency_step=${8:-1}
 model_repo_name=${9:-"models"}
-input_data=${10:-"performance/data/dummy_data.json"}
-remote_server=${11:-"false"}  # Default to false
-max_attempts=5  # Maximum attempts to generate the file
+input_data=${10:-"performance/data/perf_data_odd_mu200.json"}
+remote_server=${11:-"false"} 
+max_attempts=5
 
 # Display help information
 help_function() {
@@ -67,7 +67,7 @@ check_server_ready() {
         # Use curl to check the server's status. The -s flag silences curl's output, and -o /dev/null discards the actual content.
         local response=$(curl -s -o /dev/null -w "%{http_code}" localhost:8000/v2/health/ready)
         echo "Response: $response"
-        if [[ "$response" == "200" ]]; then
+        if [[ "$response" == "200" || "$remote_server" == "true" ]]; then
             server_ready=1
             echo "Server is ready!"
             echo ""
@@ -102,10 +102,6 @@ else
     echo "Invalid value for remote_server. Please set it to either 'true' or 'false'."
     exit 1s
 fi
-
-
-# Set a trap to ensure tritonserver is always killed on exit
-trap 'echo "Killing triton server..."; kill "$server_pid"' EXIT
 
 # Check server's readiness
 check_server_ready
