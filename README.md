@@ -62,25 +62,23 @@ python compare_gpu_cpu_traccc.py
 
 ## Test k8 server performance
 
-To run `perf_analyzer` on a k8 cluster such as nautilus, follow the instructions on setting up the server in [traccc-aas](https://github.com/milescb/traccc-aaS). Then, forward the following ports:
+To run `perf_analyzer` on a k8 cluster such as nautilus, follow the instructions on setting up the server in [traccc-aas](https://github.com/milescb/traccc-aaS). Then, forward the gRPC port:
 
 ```
 kubectl port-forward service/triton-atlas 8001:8001 -n atlas-sonic
 ```
 
-and 
+This avoids ssl authentication errors interfering with `perf_analyzer`. Then, run `perf_analyzer` as usual: 
 
 ```
-kubectl port-forward service/triton-atlas 8002:8002 -n atlas-sonic
+data/nrp_inference_multi_gpu/ # if not already created
+perf_analyzer -m traccc-gpu -i grpc \
+    --input-data data/perf_data_odd_mu200.json --concurrency-range 1:20:1 \
+    --measurement-interval 10000 -u localhost:8001 -r 30 \
+    > data/nrp_inference_multi_gpu/out4gpu_1inst_take1.txt
 ```
 
-Then, run the performance script:
-
-```
-./submit/run_analyzer.sh <outdir> "" "" "" true
-```
-
-Finally, make plots with the produced data as before. 
+Finally, to analyze the results, use the `multi_gpu_nautilus.ipynb` notebook. GPU performance metrics can be obtained through `Prometheus` which, at NRP, is accessible at `https://prometheus.nrp-nautilus.io`. All GPU metrics are prefixed with `nv_`. A few good metrics to analyzer are GPU utilization (`nv_gpu_utilization`), GPU power utilization (`nv_gpu_power_usage / nv_gpu_power_limit`), CPU utilization (`nv_cpu_utilization`), and the queue latency (`nv_inference_queue_duration_us / nv_inference_exec_count`). 
 
 ### !! Important !!
 
