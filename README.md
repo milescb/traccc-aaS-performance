@@ -65,7 +65,7 @@ python compare_gpu_cpu_traccc.py
 To run `perf_analyzer` on a k8 cluster such as nautilus, follow the instructions on setting up the server in [traccc-aas](https://github.com/milescb/traccc-aaS). Then, forward the gRPC port:
 
 ```
-kubectl port-forward service/triton-atlas 8001:8001 -n atlas-sonic
+kubectl port-forward service/atlas-sonic 8001:8001 -n atlas-sonic
 ```
 
 This avoids ssl authentication errors interfering with `perf_analyzer`. Then, run `perf_analyzer` as usual: 
@@ -85,5 +85,5 @@ Finally, to analyze the results, use the `multi_gpu_nautilus.ipynb` notebook. GP
 Do not forget to uninstall the remote server when done testing:
 
 ```
-helm uninstall super-sonic -n atlas-sonic
+helm uninstall atlas-sonic -n atlas-sonic
 ```
