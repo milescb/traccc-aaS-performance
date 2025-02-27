@@ -32,28 +32,21 @@ def plot_memory_usage(instances, gpu_memory_util, savedir):
     
     fig.savefig(f"{savedir}/gpu_memory_util.pdf", bbox_inches='tight')
     
-def plot_throughput(instances, throughputs, gpu_util, savedir):
+def plot_throughput_and_GPUutil_vs_var(variable, throughputs, gpu_util, savedir, 
+                           xlabel='Number of Triton Model Instances',
+                           device="NVIDIA A100 SXM4 40GB",
+                           title=r'ODD detector, $\mu = 200$, traccc e7a03e9'):
     """
-    Plot throughput and GPU utilization as a function of the number of 
-    Triton model instances.
     
-    Parameters:
-    - instances: list of integers, the number of Triton model instances
-    - throughputs: list of floats, the throughput
-    - gpu_util: list of floats, the GPU utilization
-    - savedir: str, the directory to save the plot
-    
-    Returns:
-    - None
     """
     fig, ax1 = plt.subplots(figsize=figsize)
 
     # Throughput axis
-    ax1.plot(instances, throughputs, label='Throughput', 
+    ax1.plot(variable, throughputs, label='Throughput', 
              marker='o', color=colors(0))
-    ax1.set_xlabel('Number of Triton Model Instances')
+    ax1.set_xlabel(xlabel)
     ax1.set_ylabel('Throughput (Inferences/Second)')
-    ax1.set_title(TITLE, loc='left', fontsize=12)
+    ax1.set_title(device+', '+title, loc='left', fontsize=12)
     ax1.yaxis.label.set_color(colors(0))
     ax1.tick_params(axis='y', colors=colors(0))
 
@@ -61,9 +54,9 @@ def plot_throughput(instances, throughputs, gpu_util, savedir):
     ax2 = ax1.twinx()
 
     # GPU Utilization axis
-    ax2.plot(instances, gpu_util, label='GPU Utilization', 
+    ax2.plot(variable, gpu_util, label='GPU Utilization', 
              marker='P', color=colors(1))
-    ax2.set_ylabel('GPU Utilization (%)')
+    ax2.set_ylabel('Average GPU Utilization (%)')
     ax2.set_ylim(0, 100)
     ax2.yaxis.label.set_color(colors(1))
     ax2.tick_params(axis='y', colors=colors(1))

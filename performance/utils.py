@@ -61,11 +61,17 @@ def clean_pandas_df(df):
         for i, power in enumerate(gpu_power_utilization):
             _, power = power.split(':')
             new_col_name = f'gpu_power_{i}_W'
+            new_col_name_percent = f'gpu_power_{i}_percent'
             
             # Add the power value to the new_columns dictionary
             if new_col_name not in new_columns:
-                new_columns[new_col_name] = [None] * len(df) 
-            new_columns[new_col_name][index] = pd.to_numeric(power, errors='coerce')
+                new_columns[new_col_name] = [None] * len(df)
+            if new_col_name_percent not in new_columns:
+                new_columns[new_col_name_percent] = [None] * len(df)
+                
+            power_value = pd.to_numeric(power, errors='coerce')
+            new_columns[new_col_name][index] = power_value
+            new_columns[new_col_name_percent][index] = (power_value / total_gpu_power) * 100
     
     # Add the new columns to the DataFrame
     for new_col_name, values in new_columns.items():

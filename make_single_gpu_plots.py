@@ -26,4 +26,4 @@ for inst in instances:
 
 # make plots   
 plot_memory_usage(instances, gpu_memory_util, args.outdir)
-plot_throughput(instances, throughputs, gpu_util, args.outdir)
+plot_throughput_and_GPUutil_vs_var(instances, throughputs, gpu_util, args.outdir)
