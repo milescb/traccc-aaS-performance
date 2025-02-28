@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 import mplhep as hep
 hep.style.use(hep.style.ATLAS)
 
-def plot_memory_usage(data, OUT_DIR, N_INSTANCES, PLOT_INST_LABEL,
-                      nGPUs=2,
+def plot_memory_usage(data, OUT_DIR, N_INSTANCES, nGPUs=2,
                       device='NVIDIA A100 SXM4 40GB',
                       title=r"ODD detector, $\mu = 200$, traccc e7a03e9"):
     """
     
     """
+    PLOT_INST_LABEL = str(N_INSTANCES)
     plt.figure(figsize=(7, 7))
     for i in range(nGPUs):
         plt.plot(data['Concurrency'].values, 
@@ -25,13 +25,13 @@ def plot_memory_usage(data, OUT_DIR, N_INSTANCES, PLOT_INST_LABEL,
     plt.savefig(f'{OUT_DIR}/concurrency_vs_gpu_memory_util_{N_INSTANCES}inst.pdf', 
                     bbox_inches='tight')
     
-def plot_gpu_power_usage(data, OUT_DIR, N_INSTANCES, PLOT_INST_LABEL,
-                    nGPUs=4,
+def plot_gpu_power_usage(data, OUT_DIR, N_INSTANCES, nGPUs=4,
                     device='NVIDIA A100 SXM4 40GB',
                     title=r"ODD detector, $\mu = 200$, traccc e7a03e9"):
     """
     
     """
+    PLOT_INST_LABEL = str(N_INSTANCES)
     plt.figure(figsize=(7, 7))
     for i in range(nGPUs):
         plt.plot(data['Concurrency'].values, data[f'gpu_power_{i}_W'].values, 
@@ -46,11 +46,12 @@ def plot_gpu_power_usage(data, OUT_DIR, N_INSTANCES, PLOT_INST_LABEL,
                     bbox_inches='tight')
     
 def plot_throughput(data, data_1gpu, OUT_DIR, N_INSTANCES, nGPUs=4,
-                    device='NVIDIA A100 SXM4 40GB', PLOT_INST_LABEL='1',
+                    device='NVIDIA A100 SXM4 40GB',
                     title=r"ODD detector, $\mu = 200$, traccc e7a03e9"):
     """
     
     """
+    PLOT_INST_LABEL = str(N_INSTANCES)
     plt.figure(figsize=(7, 7))
     plt.plot(data_1gpu['Concurrency'].values, data_1gpu['Inferences/Second'].values, 
              'o-', label='1 NVIDIA A100 SXM4 40GB')
@@ -64,13 +65,13 @@ def plot_throughput(data, data_1gpu, OUT_DIR, N_INSTANCES, nGPUs=4,
     plt.savefig(f'{OUT_DIR}/concurrency_vs_throughput_{N_INSTANCES}inst.pdf', 
                     bbox_inches='tight')
     
-def plot_gpu_utilization(data, OUT_DIR, N_INSTANCES, PLOT_INST_LABEL,
-                         nGPUs=4,
+def plot_gpu_utilization(data, OUT_DIR, N_INSTANCES, nGPUs=4,
                          device='NVIDIA A100 SXM4 40GB',
                          title=r"ODD detector, $\mu = 200$, traccc e7a03e9"):
     """
     
     """
+    PLOT_INST_LABEL = str(N_INSTANCES)
     plt.figure(figsize=(7, 7))
     for i in range(nGPUs):
         plt.plot(data['Concurrency'].values, data[f'gpu_util_{i}'].values, 
