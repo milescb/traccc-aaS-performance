@@ -15,9 +15,9 @@ def plot_var(concurrency, data, ylabel, xlabel, filename='', yerr=None,
     plt.xlabel(xlabel, loc='right')
     plt.ylabel(ylabel, loc='top')
     plt.xlim(min(concurrency), max(concurrency))
-    plt.title(device+', '+title, fontsize=10, loc='left')
+    plt.title(device+', '+title, fontsize=12, loc='left')
     if filename != '':
-        plt.savefig(filename)
+        plt.savefig(filename, bbox_inches='tight')
     plt.show()
     
 def plot_multiple_vars(concurrency, data, data_labels, ylabel, xlabel, filename='',
@@ -29,10 +29,10 @@ def plot_multiple_vars(concurrency, data, data_labels, ylabel, xlabel, filename=
     plt.xlabel(xlabel, loc='right')
     plt.ylabel(ylabel, loc='top')
     plt.xlim(min(concurrency), max(concurrency))
-    plt.title(device+', '+title, fontsize=10, loc='left')
+    plt.title(device+', '+title, fontsize=12, loc='left')
     plt.legend()
     if filename != '':
-        plt.savefig(filename)
+        plt.savefig(filename, bbox_inches='tight')
     plt.show()
 
 def plot_var_and_compare(con, con_1gpu, data, data_1gpu, ylabel, xlabel, ylims=None,
@@ -46,10 +46,10 @@ def plot_var_and_compare(con, con_1gpu, data, data_1gpu, ylabel, xlabel, ylims=N
     plt.xlabel(xlabel, loc='right')
     plt.ylabel(ylabel, loc='top')
     plt.xlim(min(con)-0.1, max(con)+0.1)
-    plt.title(device+', '+title, fontsize=10, loc='left')
+    plt.title(device+', '+title, fontsize=12, loc='left')
     plt.legend(title=f'{num_instances} Triton model instance per:')
     if ylims is not None:
         plt.ylim(ylims)
     if filename != '':
-        plt.savefig(filename)
+        plt.savefig(filename, bbox_inches='tight')
     plt.show()

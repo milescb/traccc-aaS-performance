@@ -37,4 +37,3 @@ plot_throughput(data, data_1gpu, args.outdir, N_INSTANCES, PLOT_INST_LABEL,
                 nGPUs=args.n_GPUs, device=args.device, title=args.title)
 plot_gpu_utilization(data, args.outdir, N_INSTANCES, PLOT_INST_LABEL,
                      device=args.device, title=args.title)
-```
