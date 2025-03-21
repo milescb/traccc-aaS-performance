@@ -15,6 +15,9 @@ parser.add_argument('--title', type=str, help='Title for the plots',
                     default=r'ODD detector, $\mu = 200$, traccc v0.20.0')
 args = parser.parse_args()
 
+if not args.outdir:
+    args.outdir = args.indir
+
 # process data
 cpu_data_instances, gpu_data_instances = process_csv_dir(args.indir)
 data = gpu_data_instances

@@ -5,7 +5,7 @@ DIR="$(dirname "${BASH_SOURCE[0]}")"
 # salloc --nodes 1 --qos interactive --time 04:00:00 --constraint gpu --gpus=1 --account=m3443 --cpus-per-gpu=10
 # shifter --module=gpu --image=docexoty/tritonserver:latest
 
-outdir=${1:-"performance/data/main_traccc_nom/"}
+outdir=${1:-"performance/data/traccc-aaS_nominal/"}
 model_name=${2:-"models"}
 multi_gpu=${3:-"false"}
 input_data=${4:-"performance/data/perf_data_odd_mu200.json"}

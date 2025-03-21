@@ -81,7 +81,7 @@ def plot_throughput_and_GPUutil_vs_var(variable, throughputs, gpu_util, savedir,
     # GPU Utilization axis
     ax2.plot(variable, gpu_util, label='GPU Utilization', 
              marker='P', color=colors(1))
-    ax2.set_ylabel('Average GPU Utilization (%)')
+    ax2.set_ylabel('Average GPU Utilization (%)', rotation=270, y=0.67, labelpad=20)
     ax2.set_ylim(0, 100)
     ax2.yaxis.label.set_color(colors(1))
     ax2.tick_params(axis='y', colors=colors(1))
