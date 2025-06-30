@@ -1,28 +1,69 @@
 # `Traccc` as-a-service Performance Studies
 
-Set of scripts to analyze performance from the output of the `perf_analyzer` tool used to analyze performance of models using the NVIDIA triton server. These scripts are designed to analyze the performance of `traccc` as-a-service in particular. The backend for this and instructions about getting the model can be found [in this git repo](https://github.com/milescb/traccc-aaS). 
+This repository contains a set of scripts to analyze performance from the output of the `perf_analyzer` tool used to analyze performance of models using the NVIDIA triton server. These scripts are designed to analyze the performance of `traccc` as-a-service. The backend for this and instructions about getting the model can be found [in the traccc-aaS repository.](https://github.com/milescb/traccc-aaS). 
 
-## Do everything in one go
+## Prerequisites
+- NVIDIA Triton Inference Server
+- Python 3.x with required packages
+- CUDA-capable GPU
+- Docker (for containerized deployment)
+- kubectl (for Kubernetes deployment)
 
-The file `submit/run_eval.sh` runs performance studies and makes plots. A full command looks like
+We have built an image that satisfies these requirements at `docker.io/milescb/triton-server:25.02-py3_gcc13.3`. 
+You can pull this image at `nersc` with shifter via:
 
 ```
-./submit/run_eval.sh <output_data_dir> <model_name> <bool_multi_gpu>
+shifterimg pull milescb/triton-server:25.02-py3_gcc13.3
 ```
 
-## Create input for `perf_analyzer`
+and run interactively with:
+
+```
+shifter --module=gpu --image=milescb/triton-server:25.02-py3_gcc13.3
+```
+
+## Quick Start
+```bash
+# Clone and setup
+git clone git@github.com:milescb/traccc-aaS-performance.git
+cd traccc-aaS-performance
+
+# Run all tests
+bash run.sh
+``` 
+
+## Repository delieverables:
+
+The file `run.sh` creates all the plots we need for testing the standalone version of `traccc-aaS` including:
+
+- Running the standalone `traccc` executable `thoughput_cuda_mt` and collecting data for CPU and GPU performance over a wide range of pileup values
+- Running `traccc-aaS` over a wide range of pileup values. For each pileup value, inference is run for one model instance with one concurrent requests, up to eight model instances and eight concurrent requests
+- Plotting a comparison of CPU and GPU throughput for standalone `traccc` as in
+- Plotting throughput, GPU utilization, and latency for `traccc-aaS`, for instance with
+<div style="display: flex; flex-wrap: wrap; justify-content: center;">
+  <img src="./plots/throughput_gpu_util.png" alt="Throughput vs. Utilization" width="48%" style="margin: 1%;">
+</div>
+
+- Comparing throughput between standalone `traccc` and `traccc-aaS`
+<div style="display: flex; flex-wrap: wrap; justify-content: center;">
+  <img src="./plots/performance_comparison.png" alt="Comparison with Standalone" width="48%" style="margin: 1%;">
+</div>
+
+## Step-by-step instructions
+
+### Create input for `perf_analyzer`
 
 Create input json file with 
 
-```
+```bash
 python generate_json.py -i <input_file> -o <output_file>
 ```
 
-## Performance Analyzer
+### Performance Analyzer
 
 Run `perf_analyzer` with the following:
 
-```
+```bash
 perf_analyzer -m traccc-gpu --input-data $DATADIR/../test_data/test_perf_data.json
 ```
 
@@ -32,15 +73,23 @@ perf_analyzer -m traccc-gpu --input-data $DATADIR/../test_data/test_perf_data.js
 
 Run `perf_analyzer` with the CPU and GPU configuration
 
-```
-perf_analyzer -m traccc-gpu --input-data $DATADIR/../test_data/test_perf_data.json \
+```bash
+perf_analyzer -m traccc-gpu --input-data data/perf_data_odd_mu200.json \
     --concurrency-range <start>:<end>:<step> \
     --verbose-csv --collect-metrics \
     --measurement-interval 10000 \
     -f gpu_1instances.csv 
 ```
 
-Then, we can make plots with the provide python notebooks. 
+Then, we can make plots of throughput and GPU utlization with
+
+```bash
+python make_single_gpu_plots.py \
+    --indir "data" \
+    --title "ODD detector, μ = 200, traccc v0.23.0"
+```
+
+To expolore other plotting options, see python notebooks in the `notebooks` directory. 
 
 ### Compare CPU / GPU performance on `traccc` examples
 
