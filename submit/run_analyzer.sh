@@ -11,13 +11,13 @@ uname -a
 n_instance_per_gpu=${1:-1}
 n_gpus=${2:-1}
 output_csv_name=${3:-"perf_analyzer"}
-_measurement_interval=${4:-50000}
-output_dir=${5:-"performance/data/main_traccc_nom"} 
+_measurement_interval=${4:-10000}
+output_dir=${5:-"data/main_traccc_nom"} 
 concurrency_start=${6:-1}
 concurrency_end=${7:-8}
 concurrency_step=${8:-1}
 model_repo_name=${9:-"models"}
-input_data=${10:-"performance/data/perf_data_odd_mu200.json"}
+input_data=${10:-"data/perf_data_odd_mu200.json"}
 remote_server=${11:-"false"} 
 max_attempts=5
 
@@ -134,10 +134,10 @@ run_perf_analyzer() {
 
     while [[ ! -f ${output_csv} && $attempt -lt $max_attempts ]]; do
         echo "Running perf_analyzer (${mode}) with measurement_interval: $measurement_interval..."
-        perf_analyzer -m traccc-$processor --percentile=95 -i grpc --input-data $input_data \
+        perf_analyzer -m traccc-$processor -i grpc --input-data $input_data \
         --measurement-interval ${measurement_interval} $mode_flag \
-        --concurrency-range $concurrency_start:$concurrency_range:$concurrency_step -v \
-        -f ${output_csv} -b 1 --collect-metrics --verbose-csv # --metrics-interval 10000
+        --concurrency-range $concurrency_start:$concurrency_range:$concurrency_step \
+        -f ${output_csv} -r 30 --collect-metrics --verbose-csv # --percentile=95
 
         # If the file isn't generated, double the measurement_interval and retry
         if [[ ! -f ${output_csv} ]]; then
@@ -159,7 +159,7 @@ run_perf_analyzer() {
 echo "Warm up"
 perf_analyzer -m traccc-gpu --percentile=95 -i grpc \
     --input-data $input_data \
-    --concurrency 2:4:1 --measurement-interval 10000
+    --concurrency 2:2:1 --measurement-interval 10000
 
 echo "Warm up done"
 
