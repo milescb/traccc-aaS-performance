@@ -96,11 +96,13 @@ To expolore other plotting options, see python notebooks in the `notebooks` dire
 First, make `.log` files containing the output of running the `traccc` examples via (for instance)
 
 ```
-$INSTALLDIR/bin/traccc_seq_example_cuda \
+$INSTALLDIR/bin/traccc_throughput_mt_cuda \
     --use-detray-detector \
-    --detector-file=$DATADIR/tml_detector/trackml-detector.csv \
-    --digitization-file=$DATADIR/tml_detector/default-geometric-config-generic.json \
-    --input-directory=$DATADIR/tml_full/ttbar_mu100 &> data/logs/gpu_mu100.log
+    --detector-file=$DATADIR/ITk_DetectorBuilder_geometry.json \
+    --digitization-file=$DATADIR/ITk_digitization_config_with_strips_with_shift_annulus_flip.json \
+    --input-directory=client/ \
+    --material-file=$DATADIR/ITk_detector_material.json \
+    --read-bfield-from-file --bfield-file $DATADIR/ITk_bfield.cvf
 ```
 
 then run the following to create the plot:

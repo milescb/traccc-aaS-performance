@@ -3,13 +3,13 @@
 n_events=${1:-10}
 compare_nominal=${2:-true}
 
-if [[ $compare_nominal == "true" ]]; then
-    echo "Running standalone traccc"
-    mkdir -p "data/traccc-aaS_standalone/"
-    bash submit/run_traccc_standalone.sh \
-        "data/traccc-aaS_standalone/" \
-        $n_events
-fi
+# if [[ $compare_nominal == "true" ]]; then
+#     echo "Running standalone traccc"
+#     mkdir -p "data/traccc-aaS_standalone/"
+#     bash submit/run_traccc_standalone.sh \
+#         "data/traccc-aaS_standalone/" \
+#         $n_events
+# fi
 
 echo "Running as-a-Service"
 

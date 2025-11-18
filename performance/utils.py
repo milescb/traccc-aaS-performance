@@ -29,7 +29,7 @@ def clean_pandas_df(df):
         gpu_total_memory = row['Total GPU Memory'].rstrip(';').split(';')
         
         gpu_power_utilization = row['Avg GPU Power Usage'].rstrip(';').split(';')
-        total_gpu_power = 250 # Watts
+        total_gpu_power = 400 # Watts
         
         for i, gpu in enumerate(gpus):
             _, utilization = gpu.split(':')

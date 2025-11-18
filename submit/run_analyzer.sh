@@ -12,12 +12,12 @@ n_instance_per_gpu=${1:-1}
 n_gpus=${2:-1}
 output_csv_name=${3:-"perf_analyzer"}
 _measurement_interval=${4:-10000}
-output_dir=${5:-"data/main_traccc_nom"} 
+output_dir=${5:-"data/traccc_g200_v26_take3/"} 
 concurrency_start=${6:-1}
 concurrency_end=${7:-8}
 concurrency_step=${8:-1}
 model_repo_name=${9:-"models"}
-input_data=${10:-"data/perf_data_odd_mu200.json"}
+input_data=${10:-"data/perf_data_itk.json"}
 remote_server=${11:-"false"} 
 max_attempts=5
 
@@ -40,16 +40,15 @@ if [[ "$1" == "-h" || "$1" == "--help" ]]; then
     exit 0
 fi
 
-export INSTALLDIR=/global/cfs/projectdirs/m3443/data/traccc-aaS/software/prod/ver_03202024_traccc_v0.20.0/install
+export INSTALLDIR=/global/cfs/projectdirs/m3443/data/traccc-aaS/software/prod/ver_102925/install
 export PATH=$INSTALLDIR/bin:$PATH
 export LD_LIBRARY_PATH=$INSTALLDIR/lib:$LD_LIBRARY_PATH
 
 # Update model repository configuration
-output_dir=$output_dir/${n_instance_per_gpu}insts_${n_gpus}gpus/ # avoid conflict of difference instance config
+output_dir=$output_dir/${n_instance_per_gpu}insts_${n_gpus}gpus/
 
 mkdir -p $output_dir
-cp -r $INSTALLDIR/$model_repo_name $output_dir/
-# sed -i "s/count: 1/count: ${n_instance_per_gpu}/" $output_dir/${model_repo_name}/traccc-cpu/config.pbtxt
+cp -r /global/homes/m/milescb/tracking/traccc-aaS-gpu/backend/models $output_dir/
 sed -i "s/count: 1/count: ${n_instance_per_gpu}/" $output_dir/${model_repo_name}/traccc-gpu/config.pbtxt
 
 gpus_array=$(seq 0 $((n_gpus - 1)) | tr '\n' ',' | sed 's/,$//')
@@ -59,7 +58,7 @@ check_server_ready() {
     local max_retries=100
     local retry_interval=20  # wait 10 seconds before re-trying
     local retry_count=0
-    local server_ready=0  # 0 means not ready, 1 means ready
+    local server_ready=0
 
     echo "Checking if server is ready..."
 
@@ -119,9 +118,9 @@ run_perf_analyzer() {
     local mode_flag=""
     # local concurrency_range=$(( (3 * n_instance_per_gpu * n_gpus / 2) + 2 ))  # Multiply by 1.5 using integer arithmetic and + 1
     # local concurrency_range=16
-    local concurrency_range=${concurrency_end}
-    local concurrency_step=${concurrency_step}
-    local concurrency_start=${concurrency_start}
+    local concurrency_range=$((n_instance_per_gpu + 3))
+    local concurrency_step=1
+    local concurrency_start=$n_instance_per_gpu
     echo "Concurrency Range: $concurrency_start:$concurrency_range:$concurrency_step"
 
 
@@ -137,7 +136,7 @@ run_perf_analyzer() {
         perf_analyzer -m traccc-$processor -i grpc --input-data $input_data \
         --measurement-interval ${measurement_interval} $mode_flag \
         --concurrency-range $concurrency_start:$concurrency_range:$concurrency_step \
-        -f ${output_csv} -r 30 --collect-metrics --verbose-csv # --percentile=95
+        -f ${output_csv} -r 30 --collect-metrics --verbose-csv --percentile=95
 
         # If the file isn't generated, double the measurement_interval and retry
         if [[ ! -f ${output_csv} ]]; then
@@ -157,9 +156,9 @@ run_perf_analyzer() {
 }
 
 echo "Warm up"
-perf_analyzer -m traccc-gpu --percentile=95 -i grpc \
+perf_analyzer -m traccc-gpu -i grpc \
     --input-data $input_data \
-    --concurrency 2:2:1 --measurement-interval 10000
+    --concurrency 2:2:1
 
 echo "Warm up done"
 

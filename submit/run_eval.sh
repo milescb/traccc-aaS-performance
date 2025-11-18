@@ -25,9 +25,9 @@ print_help() {
 }
 
 # Default values
-outdir="data/main_traccc_nom/"
+outdir="data/traccc_g200_v26_take2/"
 model_repo_name="models"
-input_data="data/perf_data_odd_mu200.json"
+input_data="data/perf_data_itk.json"
 multi_gpu=false
 remote_server=false
 device_name="NVIDIA-A100-SXM4-40GB"
@@ -96,13 +96,13 @@ else
     echo "Running on local server"
     echo ""
 
-    for i in {1..8}
+    for i in {1..20};
     do
         echo ""
         echo "Running with $i model instances"
         echo "-------------------------------"
         echo ""
-        "$DIR/run_analyzer.sh" $i 1 "" 10000 $outdir $i $i 1 $model_repo_name $input_data $remote_server
+        "$DIR/run_analyzer.sh" $i 1
     done
 
     # plot

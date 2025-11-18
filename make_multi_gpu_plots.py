@@ -15,7 +15,7 @@ parser.add_argument('--inFile-multiGpu', type=str,
 parser.add_argument('--device', type=str, help='Device name', 
                     default='NVIDIA A100 SXM4 40GB')
 parser.add_argument('--title', type=str, help='Title for the plots',
-                    default='ODD detector, $\mu = 200$, traccc e7a03e9')
+                    default='ODD detector, $\mu = 200$, traccc 0.26.0')
 parser.add_argument('--n-GPUs', type=int, help='Number of GPUs', default=4)
 parser.add_argument('--n-instances', type=int, help='Number of Triton model instances per GPU', default=1)
 args = parser.parse_args()
