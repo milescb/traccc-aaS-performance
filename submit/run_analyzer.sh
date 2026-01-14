@@ -12,13 +12,14 @@ n_instance_per_gpu=${1:-1}
 n_gpus=${2:-1}
 output_csv_name=${3:-"perf_analyzer"}
 _measurement_interval=${4:-10000}
-output_dir=${5:-"data/traccc_g200_v26_take3/"} 
+output_dir=${5:-"data/traccc_g200_v26_10event_v1p3/"} 
 concurrency_start=${6:-1}
 concurrency_end=${7:-8}
 concurrency_step=${8:-1}
 model_repo_name=${9:-"models"}
-input_data=${10:-"data/perf_data_itk.json"}
+input_data=${10:-"data/perf_data_itk_10events.json"}
 remote_server=${11:-"false"} 
+run_in_docker=${12:-"false"}
 max_attempts=5
 
 # Display help information
@@ -40,15 +41,25 @@ if [[ "$1" == "-h" || "$1" == "--help" ]]; then
     exit 0
 fi
 
-export INSTALLDIR=/global/cfs/projectdirs/m3443/data/traccc-aaS/software/prod/ver_102925/install
-export PATH=$INSTALLDIR/bin:$PATH
-export LD_LIBRARY_PATH=$INSTALLDIR/lib:$LD_LIBRARY_PATH
+if [[ "$run_in_docker" = "false" ]]; then
+
+    export INSTALLDIR=/global/cfs/projectdirs/m3443/data/traccc-aaS/software/prod/ver_102925/install
+    export PATH=$INSTALLDIR/bin:$PATH
+    export LD_LIBRARY_PATH=$INSTALLDIR/lib:$LD_LIBRARY_PATH
+
+fi
 
 # Update model repository configuration
 output_dir=$output_dir/${n_instance_per_gpu}insts_${n_gpus}gpus/
 
 mkdir -p $output_dir
-cp -r /global/homes/m/milescb/tracking/traccc-aaS-gpu/backend/models $output_dir/
+
+if [[ "$run_in_docker" = "true" ]]; then
+    cp -r /traccc-aaS/traccc-aaS/backend/models $output_dir/
+else 
+    cp -r $INSTALLDIR/models $output_dir/
+fi
+
 sed -i "s/count: 1/count: ${n_instance_per_gpu}/" $output_dir/${model_repo_name}/traccc-gpu/config.pbtxt
 
 gpus_array=$(seq 0 $((n_gpus - 1)) | tr '\n' ',' | sed 's/,$//')
@@ -133,10 +144,10 @@ run_perf_analyzer() {
 
     while [[ ! -f ${output_csv} && $attempt -lt $max_attempts ]]; do
         echo "Running perf_analyzer (${mode}) with measurement_interval: $measurement_interval..."
-        perf_analyzer -m traccc-$processor -i grpc --input-data $input_data \
+        perf_analyzer -m traccc-gpu -i grpc --input-data $input_data \
         --measurement-interval ${measurement_interval} $mode_flag \
         --concurrency-range $concurrency_start:$concurrency_range:$concurrency_step \
-        -f ${output_csv} -r 30 --collect-metrics --verbose-csv --percentile=95
+        -f ${output_csv} -r 30 --collect-metrics --verbose-csv --percentile=95 --metrics-interval=250 -b 1
 
         # If the file isn't generated, double the measurement_interval and retry
         if [[ ! -f ${output_csv} ]]; then
@@ -156,7 +167,7 @@ run_perf_analyzer() {
 }
 
 echo "Warm up"
-perf_analyzer -m traccc-gpu -i grpc \
+perf_analyzer -m traccc-gpu -i grpc -b 1 \
     --input-data $input_data \
     --concurrency 2:2:1
 

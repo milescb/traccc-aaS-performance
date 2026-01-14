@@ -11,10 +11,15 @@ print_help() {
     echo "  --input-data <file>  Set input data file (default: data/perf_data_odd_mu200.json)"
     echo "  --outdir <dir>       Set output directory (default: data/main_traccc_nom/)"
     echo "  --remote             Enable remote server mode"
+    echo "  --measurement-interval <n>  Set measurement interval in milliseconds (default: 10000)"
+    echo "  --concurrency-start <n>  Set concurrency start value (default: 1)"
+    echo "  --concurrency-end <n>    Set concurrency end value (default: 8)"
+    echo "  --concurrency-step <n>   Set concurrency step value (default: 1)"
     echo ""
     echo "Local server options:"
     echo "  --multi-gpu          Enable multi-GPU mode"
     echo "  --model-repo <name>  Set model repository name (default: models)"
+    echo "  --run-in-docker      Points script to correct model repo if running in a docker"
     echo ""
     echo "Remote server options:"
     echo "  --device-name <name> Set device name for plotting (default: NVIDIA A100 SXM4 40GB)"
@@ -25,14 +30,19 @@ print_help() {
 }
 
 # Default values
-outdir="data/traccc_g200_v26_take2/"
+outdir="data/main_traccc_nom/"
 model_repo_name="models"
+run_in_docker=false
 input_data="data/perf_data_itk.json"
 multi_gpu=false
 remote_server=false
-device_name="NVIDIA-A100-SXM4-40GB"
+device_name="NVIDIA-RTX-5000-Ada-Gen"
 n_gpus=1
 n_instances=1
+measurement_interval=10000
+concurrency_start=1
+concurrency_end=8
+concurrency_step=1
 
 # Parse flags
 while [[ $# -gt 0 ]]; do
@@ -56,6 +66,10 @@ while [[ $# -gt 0 ]]; do
             model_repo_name="$2"
             shift 2
             ;;
+        --run-in-docker)
+            run_in_docker="$2"
+            shift 2
+            ;;
         --input-data)
             input_data="$2"
             shift 2
@@ -70,6 +84,22 @@ while [[ $# -gt 0 ]]; do
             ;;
         --n-instances)
             n_instances="$2"
+            shift 2
+            ;;
+        --measurement-interval)
+            measurement_interval="$2"
+            shift 2
+            ;;
+        --concurrency-start)
+            concurrency_start="$2"
+            shift 2
+            ;;
+        --concurrency-end)
+            concurrency_end="$2"
+            shift 2
+            ;;
+        --concurrency-step)
+            concurrency_step="$2"
             shift 2
             ;;
         *)
@@ -87,22 +117,21 @@ if [ "$remote_server" == "true" ]; then
     echo "Please make sure that the remote server is deployed and running"
     echo ""
 
-    "$DIR/run_remote_analyzer.sh" $outdir $input_data $n_gpus $n_instances 10000 1 10 1
+    "$DIR/run_remote_analyzer.sh" $outdir $input_data $n_gpus $n_instances $measurement_interval $concurrency_start $concurrency_end $concurrency_step
 
     echo "Making plots..."
-    python3 "$DIR/../make_remote_deploy_plots.py" --indir=$outdir --outdir=$outdir \
-        --infile="${n_gpus}gpus_${n_instance_per_gpu}instance.csv" --device=$device_name --n-GPUs=$n_gpus --n-instances=$n_instances
+    python3 "$DIR/../make_remote_deploy_plots.py" --indir=$outdir --outdir=$outdir
 else
     echo "Running on local server"
     echo ""
 
-    for i in {1..20};
+    for i in {1..12};
     do
         echo ""
         echo "Running with $i model instances"
         echo "-------------------------------"
         echo ""
-        "$DIR/run_analyzer.sh" $i 1
+        "$DIR/run_analyzer.sh" $i $n_gpus "" $measurement_interval $outdir $concurrency_start $concurrency_end $concurrency_step $model_repo_name $input_data $remote_server
     done
 
     # plot
@@ -113,8 +142,8 @@ else
         echo "Running with 1 model instance on 4 GPUs"
         echo "---------------------------------------"
         echo ""
-        "$DIR/run_analyzer.sh" 1 4 "" 10000 $outdir 1 8 1 $model_repo_name $input_data $remote_server
-        "$DIR/run_analyzer.sh" 1 1 "" 10000 $outdir 1 8 1 $model_repo_name $input_data $remote_server
+        "$DIR/run_analyzer.sh" 1 4 "" $measurement_interval $outdir $concurrency_start $concurrency_end $concurrency_step $model_repo_name $input_data $remote_server
+        "$DIR/run_analyzer.sh" 1 1 "" $measurement_interval $outdir $concurrency_start $concurrency_end $concurrency_step $model_repo_name $input_data $remote_server
 
         python3 "$DIR/../make_multi_gpu_plots.py" --indir=$outdir --outdir=$outdir --n-instances 1
     fi
